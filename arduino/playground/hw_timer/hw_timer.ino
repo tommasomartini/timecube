@@ -1,10 +1,10 @@
-int ledState = LOW;
-volatile int flag = 0;
+volatile bool ledState = LOW;
 
 extern "C" {
   void TIMER4_IRQHandler_v() {
     if (NRF_TIMER4->EVENTS_COMPARE[0] & TIMER_EVENTS_COMPARE_EVENTS_COMPARE_Msk) {
-      ++flag;
+      ledState = !ledState;
+      digitalWrite(LED_BUILTIN, ledState);
       NRF_TIMER4->EVENTS_COMPARE[0] = 0;
     }
   }
@@ -28,39 +28,24 @@ void startTimer() {
 
   // f_timer = 16 MHz / (2^PRESCALER).
   // The highest possible prescaler is 15 (1111 in binary), which gives ~488 Hz.
-  unsigned int prescaler = 15;
-  TIMER->PRESCALER = (prescaler << TIMER_PRESCALER_PRESCALER_Pos) << TIMER_PRESCALER_PRESCALER_Msk;
+  unsigned int prescaler = 8;
+  TIMER->PRESCALER = (prescaler << TIMER_PRESCALER_PRESCALER_Pos) & TIMER_PRESCALER_PRESCALER_Msk;
 
-  unsigned int cc = 488;
-  TIMER->CC[0] = (cc << TIMER_CC_CC_Pos) << TIMER_CC_CC_Msk;
-  Serial.println("-3");
+  unsigned int cc = 62500;
+  TIMER->CC[0] = (cc << TIMER_CC_CC_Pos) & TIMER_CC_CC_Msk;
 
   NVIC_EnableIRQ(TIMER4_IRQn);
-  Serial.println("-2");
-
   TIMER->TASKS_START = (1 << TIMER_TASKS_START_TASKS_START_Pos) & TIMER_TASKS_START_TASKS_START_Msk;
-  Serial.println("-1");
 }
 
 void setup() {
   Serial.begin(9600);
   while (!Serial);
 
-  Serial.println("Starting");
-  
   pinMode(LED_BUILTIN, OUTPUT);
-
-  for (int i = 0; i < 5; ++i) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(200);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(200);
-  }
-  
   startTimer();
+
+  Serial.println("Starting");
 }
 
-void loop() {
-//  digitalWrite(LED_BUILTIN, ledState);
-  Serial.println(flag);
-}
+void loop() {}
