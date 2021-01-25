@@ -1,15 +1,16 @@
 volatile bool ledState = LOW;
 volatile NRF_RTC_Type* TIMER = NRF_RTC2;
 
-//extern "C" {
-//  void TIMER4_IRQHandler_v() {
-//    if (TIMER->EVENTS_COMPARE[0] & TIMER_EVENTS_COMPARE_EVENTS_COMPARE_Msk) {
-//      ledState = !ledState;
-//      digitalWrite(LED_BUILTIN, ledState);
-//      TIMER->EVENTS_COMPARE[0] = 0;
-//    }
-//  }
-//}
+extern "C" {
+  void RTC2_IRQHandler_v() {
+    if (TIMER->EVENTS_COMPARE[0] & RTC_EVENTS_COMPARE_EVENTS_COMPARE_Msk) {
+      ledState = !ledState;
+      digitalWrite(LED_BUILTIN, ledState);
+      TIMER->EVENTS_COMPARE[0] = 0;
+       TIMER->TASKS_CLEAR = (1 << RTC_TASKS_CLEAR_TASKS_CLEAR_Pos) & RTC_TASKS_CLEAR_TASKS_CLEAR_Msk;
+    }
+  }
+}
 
 void printHighFreqClockStatus() {
   unsigned int HFCLK_run = NRF_CLOCK->HFCLKRUN;
@@ -116,39 +117,32 @@ void startClock() {
   NRF_CLOCK->TASKS_HFCLKSTOP = (1 << CLOCK_TASKS_HFCLKSTOP_TASKS_HFCLKSTOP_Pos) & CLOCK_TASKS_HFCLKSTOP_TASKS_HFCLKSTOP_Msk;
   NRF_CLOCK->TASKS_LFCLKSTOP = (1 << CLOCK_TASKS_LFCLKSTOP_TASKS_LFCLKSTOP_Pos) & CLOCK_TASKS_LFCLKSTOP_TASKS_LFCLKSTOP_Msk;
 
-  NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSRC_SRC_Xtal << CLOCK_LFCLKSRC_SRC_Pos) & CLOCK_LFCLKSRC_SRC_Msk;
+  NRF_CLOCK->LFCLKSRC = ((CLOCK_LFCLKSRC_EXTERNAL_Disabled << CLOCK_LFCLKSRC_EXTERNAL_Pos) & CLOCK_LFCLKSRC_EXTERNAL_Msk)
+                      | ((CLOCK_LFCLKSRC_BYPASS_Disabled << CLOCK_LFCLKSRC_BYPASS_Pos) & CLOCK_LFCLKSRC_BYPASS_Msk)
+                      | ((CLOCK_LFCLKSRC_SRC_Xtal << CLOCK_LFCLKSRC_SRC_Pos) & CLOCK_LFCLKSRC_SRC_Msk);
+
   NRF_CLOCK->LFRCMODE = (CLOCK_LFRCMODE_MODE_ULP << CLOCK_LFRCMODE_MODE_Pos) & CLOCK_LFRCMODE_MODE_Msk;
 
   NRF_CLOCK->TASKS_LFCLKSTART = (1 << CLOCK_TASKS_LFCLKSTART_TASKS_LFCLKSTART_Pos) & CLOCK_TASKS_LFCLKSTART_TASKS_LFCLKSTART_Msk;
-  
-  printLowFreqClockStatus();
-  printHighFreqClockStatus();
 }
 
 void startTimer() {
-//  // Stop the timer task before setting it.
-//  TIMER->TASKS_STOP = (1 << TIMER_TASKS_START_TASKS_START_Pos) & TIMER_TASKS_START_TASKS_START_Msk;
-//
-//  // Reset the time.
-//  TIMER->TASKS_CLEAR = (1 << TIMER_TASKS_CLEAR_TASKS_CLEAR_Pos) & TIMER_TASKS_CLEAR_TASKS_CLEAR_Msk;
-//
-//  // When the compare triggers clear the timer and generate an interrupt.
-//  TIMER->SHORTS = (TIMER_SHORTS_COMPARE0_CLEAR_Enabled << TIMER_SHORTS_COMPARE0_CLEAR_Pos) & TIMER_SHORTS_COMPARE0_CLEAR_Msk;
-//  TIMER->INTENSET = (TIMER_INTENSET_COMPARE0_Set << TIMER_INTENSET_COMPARE0_Pos) & TIMER_INTENSET_COMPARE0_Msk;
-//
-//  TIMER->MODE = (TIMER_MODE_MODE_Timer << TIMER_MODE_MODE_Pos) & TIMER_MODE_MODE_Msk;
-//  TIMER->BITMODE = (TIMER_BITMODE_BITMODE_32Bit << TIMER_BITMODE_BITMODE_Pos) & TIMER_BITMODE_BITMODE_Msk;
-//
-//  // f_timer = 16 MHz / (2^PRESCALER).
-//  // The highest possible prescaler is 15 (1111 in binary), which gives ~488 Hz.
-//  unsigned int prescaler = 8;
-//  TIMER->PRESCALER = (prescaler << TIMER_PRESCALER_PRESCALER_Pos) & TIMER_PRESCALER_PRESCALER_Msk;
-//
-//  unsigned int cc = 62500;
-//  TIMER->CC[0] = (cc << TIMER_CC_CC_Pos) & TIMER_CC_CC_Msk;
-//
-//  NVIC_EnableIRQ(TIMER4_IRQn);
-//  TIMER->TASKS_START = (1 << TIMER_TASKS_START_TASKS_START_Pos) & TIMER_TASKS_START_TASKS_START_Msk;
+  TIMER->TASKS_STOP = (1 << RTC_TASKS_START_TASKS_START_Pos) & RTC_TASKS_START_TASKS_START_Msk;
+  TIMER->TASKS_CLEAR = (1 << RTC_TASKS_CLEAR_TASKS_CLEAR_Pos) & RTC_TASKS_CLEAR_TASKS_CLEAR_Msk;
+
+  TIMER->INTENSET = (RTC_INTENSET_COMPARE0_Set << RTC_INTENSET_COMPARE0_Pos) & RTC_INTENSET_COMPARE0_Msk;
+  TIMER->EVTEN = (RTC_EVTEN_COMPARE0_Enabled << RTC_EVTEN_COMPARE0_Pos) & RTC_EVTEN_COMPARE0_Msk;
+
+  // f_timer = 32.768 kHz / (PRESCALER + 1).
+  // The highest possible prescaler is 4095 = 2^11-1 (12 bits set to 1), which gives ~488 Hz.
+  unsigned int prescaler = 1023;
+  TIMER->PRESCALER = (prescaler << RTC_PRESCALER_PRESCALER_Pos) & RTC_PRESCALER_PRESCALER_Msk;
+
+  unsigned int cc = 32;
+  TIMER->CC[0] = (cc << RTC_CC_COMPARE_Pos) & RTC_CC_COMPARE_Msk;
+
+  NVIC_EnableIRQ(RTC2_IRQn);
+  TIMER->TASKS_START = (1 << RTC_TASKS_START_TASKS_START_Pos) & RTC_TASKS_START_TASKS_START_Msk;
 }
 
 void setup() {
@@ -157,7 +151,9 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   startClock();
-//  startTimer();
+  printLowFreqClockStatus();
+  printHighFreqClockStatus();
+  startTimer();
 
   Serial.println("Starting");
 }
