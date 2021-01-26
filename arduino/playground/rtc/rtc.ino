@@ -7,7 +7,7 @@ extern "C" {
       ledState = !ledState;
       digitalWrite(LED_BUILTIN, ledState);
       TIMER->EVENTS_COMPARE[0] = 0;
-       TIMER->TASKS_CLEAR = (1 << RTC_TASKS_CLEAR_TASKS_CLEAR_Pos) & RTC_TASKS_CLEAR_TASKS_CLEAR_Msk;
+      TIMER->TASKS_CLEAR = (1 << RTC_TASKS_CLEAR_TASKS_CLEAR_Pos) & RTC_TASKS_CLEAR_TASKS_CLEAR_Msk;
     }
   }
 }
@@ -131,14 +131,14 @@ void startTimer() {
   TIMER->TASKS_CLEAR = (1 << RTC_TASKS_CLEAR_TASKS_CLEAR_Pos) & RTC_TASKS_CLEAR_TASKS_CLEAR_Msk;
 
   TIMER->INTENSET = (RTC_INTENSET_COMPARE0_Set << RTC_INTENSET_COMPARE0_Pos) & RTC_INTENSET_COMPARE0_Msk;
-  TIMER->EVTEN = (RTC_EVTEN_COMPARE0_Enabled << RTC_EVTEN_COMPARE0_Pos) & RTC_EVTEN_COMPARE0_Msk;
+  TIMER->EVTENSET = (RTC_EVTENSET_COMPARE0_Enabled << RTC_EVTENSET_COMPARE0_Pos) & RTC_EVTENSET_COMPARE0_Msk;
 
   // f_timer = 32.768 kHz / (PRESCALER + 1).
   // The highest possible prescaler is 4095 = 2^11-1 (12 bits set to 1), which gives ~488 Hz.
   unsigned int prescaler = 1023;
   TIMER->PRESCALER = (prescaler << RTC_PRESCALER_PRESCALER_Pos) & RTC_PRESCALER_PRESCALER_Msk;
 
-  unsigned int cc = 32;
+  unsigned int cc = 16;
   TIMER->CC[0] = (cc << RTC_CC_COMPARE_Pos) & RTC_CC_COMPARE_Msk;
 
   NVIC_EnableIRQ(RTC2_IRQn);
