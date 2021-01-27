@@ -8,7 +8,7 @@ float EPS = 1e-6;
 
 
 TimeCube::TimeCube()
-: _x(0), _y(0), _z(1), _sideUp(Side::SIDE_NONE)
+: _x(0), _y(0), _z(1), _sideUp(Side::SIDE_NONE), _state(EXPIRED)
 {}
 
 float TimeCube::computeNorm(const float x, const float y, const float z) {
@@ -62,26 +62,82 @@ TimeCube::Axis TimeCube::getLargestComponent() {
   return axis;
 }
 
-void TimeCube::setSideUp() {
+bool TimeCube::updateSideUp() {
+  Side oldSide = _sideUp;
+
   Axis dominantComponent = getLargestComponent();
   if (!gravityCloseToAxis(dominantComponent)) {
-    // The gravity vector is not within the acceptance cone.
+    // Transitioning between two up-sides.
     _sideUp = SIDE_NONE;
+  } else {
+    switch (dominantComponent) {
+      case AXIS_X:
+        _sideUp = _x >= 0 ? Side::SIDE_REAR : Side::SIDE_FRONT;
+        break;
+
+      case AXIS_Y:
+        _sideUp = _y >= 0 ? Side::SIDE_LEFT : Side::SIDE_RIGHT;
+        break;
+
+      // case AXIS_Z:
+      default:
+        _sideUp = _z >= 0 ? Side::SIDE_TOP : Side::SIDE_BOTTOM;
+        break;
+      }
+  }
+
+  return _sideUp != oldSide;
+}
+
+void TimeCube::standby() {
+  switch (_state) {
+    case COUNTING:
+      // Stop the running timer.
+      break;
+    case BLINKING:
+      // Stop the running blinker.
+      break;
+    default:
+      // Nothing to do.
+      break;
+  }
+
+  _state = STANDBY;
+}
+
+void TimeCube::startTimer() {
+  _state = COUNTING;
+}
+
+void TimeCube::newUpSideCallback() {
+  if (_sideUp == SIDE_TOP) {
+    // Go back to standby.
+    standby();
+  } else {
+    // Start the relative timer.
+  }
+}
+
+void TimeCube::sameUpSideCallback() {
+  if (_sideUp == SIDE_TOP) {
+    // Nothing to do: remain in standby mode.
     return;
   }
 
-  switch (dominantComponent) {
-  case AXIS_X:
-    _sideUp = _x >= 0 ? Side::SIDE_REAR : Side::SIDE_FRONT;
-    break;
+  if (_state == EXPIRED) {
+    // Nothing to do: wait to go back in standby or to start another timer.
+    return;
+  }
 
-  case AXIS_Y:
-    _sideUp = _y >= 0 ? Side::SIDE_LEFT : Side::SIDE_RIGHT;
-    break;
-
-  case AXIS_Z:
-    _sideUp = _z >= 0 ? Side::SIDE_TOP : Side::SIDE_BOTTOM;
-    break;
+  switch (_state) {
+    case COUNTING:
+      // Check if the timer expired.
+      break;
+    case BLINKING:
+      // Check if the blinking expired.
+      break;
+    default:
+      break;
   }
 }
 
@@ -96,7 +152,11 @@ void TimeCube::update(const float x, const float y, const float z) {
   _y = y / norm;
   _z = z / norm;
 
-  setSideUp();
+  if (updateSideUp()) {
+    newUpSideCallback();
+  } else {
+    sameUpSideCallback();
+  }
 }
 
 float TimeCube::getX() {
