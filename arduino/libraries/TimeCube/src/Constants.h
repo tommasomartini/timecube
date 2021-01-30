@@ -3,6 +3,14 @@
 
 #include <string>
 
+/*
+ * Axes definitions:
+ * X: from rear to front
+ * Y: from left to right
+ * Z: from top to bottom
+ *
+ * Gravity is along Z when the cube is in its initial position.
+ */
 enum Axis {
   AXIS_X,
   AXIS_Y,
