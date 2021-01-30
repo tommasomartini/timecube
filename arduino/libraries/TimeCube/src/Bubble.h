@@ -1,10 +1,7 @@
-
 #ifndef BUBBLE_H
 #define BUBBLE_H
 
 #include "Constants.h"
-
-#include <Arduino.h>
 
 class Bubble {
 private:
