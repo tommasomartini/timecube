@@ -7,11 +7,11 @@ float EPS = 1e-6;
 }
 
 
-Bubble::Bubble()
-: _x(0), _y(0), _z(1), _sideUp(Side::SIDE_NONE)
+Bubble::Bubble(Side* upSide)
+: _normX(1.0f), _normY(1.0f), _normZ(1.0f), _upSide(upSide)
 {}
 
-float Bubble::computeNorm(const float x, const float y, const float z) {
+float Bubble::computeNorm(float x, float y, float z) {
   return std::sqrt(x * x + y * y + z * z);
 }
 
@@ -19,13 +19,13 @@ float Bubble::computeGravityAngleToAxisDeg(const Axis axis) {
   float component;
   switch (axis) {
   case AXIS_X:
-    component = _x;
+    component = _normX;
     break;
   case AXIS_Y:
-    component = _y;
+    component = _normY;
     break;
   case AXIS_Z:
-    component = _z;
+    component = _normZ;
     break;
   }
 
@@ -48,15 +48,14 @@ bool Bubble::gravityCloseToAxis(const Axis axis) {
 Axis Bubble::getLargestComponent() {
   // The initial guess is that the X component is the largest.
   Axis axis = AXIS_X;
-  float magnitude = _x;
+  float magnitude = _normX;
 
-  if (abs(_y) > abs(magnitude)) {
+  if (abs(_normY) > abs(magnitude)) {
     axis = AXIS_Y;
-    magnitude = _y;
+    magnitude = _normY;
   }
-  if (abs(_z) > abs(magnitude)) {
+  if (abs(_normZ) > abs(magnitude)) {
     axis = AXIS_Z;
-    magnitude = _z;
   }
 
   return axis;
@@ -69,12 +68,14 @@ void Bubble::updateGravity(float x, float y, float z) {
     return;
   }
 
-  _x = x / norm;
-  _y = y / norm;
-  _z = z / norm;
+  _normX = x / norm;
+  _normY = y / norm;
+  _normZ = z / norm;
 }
 
-void Bubble::updateUpSide() {
+void Bubble::updateUpSide(float x, float y, float z) {
+  updateGravity(x, y, z);
+
   Axis dominantComponent = getLargestComponent();
   if (!gravityCloseToAxis(dominantComponent)) {
     // Transitioning does not count as a new side up: do not update.
@@ -83,22 +84,16 @@ void Bubble::updateUpSide() {
 
   switch (dominantComponent) {
   case AXIS_X:
-    _sideUp = _x >= 0 ? Side::SIDE_REAR : Side::SIDE_FRONT;
+    *_upSide = _normX >= 0 ? Side::SIDE_REAR : Side::SIDE_FRONT;
     break;
 
   case AXIS_Y:
-    _sideUp = _y >= 0 ? Side::SIDE_LEFT : Side::SIDE_RIGHT;
+    *_upSide = _normY >= 0 ? Side::SIDE_LEFT : Side::SIDE_RIGHT;
     break;
 
-    // case AXIS_Z:
   default:
-    _sideUp = _z >= 0 ? Side::SIDE_TOP : Side::SIDE_BOTTOM;
+    // case AXIS_Z:
+    *_upSide = _normZ >= 0 ? Side::SIDE_TOP : Side::SIDE_BOTTOM;
     break;
   }
-}
-
-Side Bubble::getUpSide(const float x, const float y, const float z) {
-  updateGravity(x, y, z);
-  updateUpSide();
-  return _sideUp;
 }
