@@ -11,11 +11,11 @@ Bubble::Bubble(Side* upSide)
 : _normX(1.0f), _normY(1.0f), _normZ(1.0f), _upSide(upSide)
 {}
 
-float Bubble::computeNorm(float x, float y, float z) {
+float Bubble::computeNorm(float x, float y, float z) const {
   return std::sqrt(x * x + y * y + z * z);
 }
 
-float Bubble::computeGravityAngleToAxisDeg(const Axis axis) {
+float Bubble::computeGravityAngleToAxisDeg(const Axis axis) const {
   float component;
   switch (axis) {
   case AXIS_X:
@@ -32,7 +32,7 @@ float Bubble::computeGravityAngleToAxisDeg(const Axis axis) {
   return std::acos(component) * 180.0 / M_PI;
 }
 
-bool Bubble::gravityCloseToAxis(const Axis axis) {
+bool Bubble::gravityCloseToAxis(const Axis axis) const {
   float angleWithAxisDeg = computeGravityAngleToAxisDeg(axis);
   if (angleWithAxisDeg <= TILT_THRESHOLD_deg) {
     return true;
@@ -45,7 +45,7 @@ bool Bubble::gravityCloseToAxis(const Axis axis) {
   return false;
 }
 
-Axis Bubble::getLargestComponent() {
+Axis Bubble::getLargestComponent() const {
   // The initial guess is that the X component is the largest.
   Axis axis = AXIS_X;
   float magnitude = _normX;

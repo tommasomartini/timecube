@@ -11,10 +11,10 @@ private:
   float _normX, _normY, _normZ;
   Side* _upSide;
 
-  float computeNorm(float x, float y, float z);
-  float computeGravityAngleToAxisDeg(Axis axis);
-  bool gravityCloseToAxis(Axis axis);
-  Axis getLargestComponent();
+  float computeNorm(float x, float y, float z) const;
+  float computeGravityAngleToAxisDeg(Axis axis) const;
+  bool gravityCloseToAxis(Axis axis) const;
+  Axis getLargestComponent() const;
   void updateGravity(float x, float y, float z);
 
 public:
