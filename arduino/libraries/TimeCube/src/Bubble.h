@@ -9,18 +9,23 @@ private:
   const float TILT_THRESHOLD_deg = 30.0;
 
   float _normX, _normY, _normZ;
-  Side* _upSide;
+  Side _upSide;
 
-  float computeNorm(float x, float y, float z) const;
+  bool readGravity();
+  float computeNorm() const;
   float computeGravityAngleToAxisDeg(Axis axis) const;
   bool gravityCloseToAxis(Axis axis) const;
   Axis getLargestComponent() const;
-  void updateGravity(float x, float y, float z);
+  void normalizeGravity();
 
 public:
-  Bubble(Side* upSide);
+  Bubble();
 
-  void updateUpSide(float x, float y, float z);
+  /**
+   * Returns false if initialization fails; true otherwise.
+   */
+  bool initialize();
+  Side getUpSide();
 };
 
 #endif

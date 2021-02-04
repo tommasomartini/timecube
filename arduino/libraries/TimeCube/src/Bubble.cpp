@@ -1,18 +1,38 @@
 #include "Bubble.h"
 
+#include <Arduino_LSM9DS1.h>
+
 #include <cmath>
+#include <stdexcept>
 
 namespace {
 float EPS = 1e-6;
+
+// How long to try to initialize before giving up.
+unsigned long MAX_INIT_TIME_s = 3;
 }
 
 
-Bubble::Bubble(Side* upSide)
-: _normX(1.0f), _normY(1.0f), _normZ(1.0f), _upSide(upSide)
+Bubble::Bubble()
+: _normX(0.0f), _normY(0.0f), _normZ(1.0f), _upSide()
 {}
 
-float Bubble::computeNorm(float x, float y, float z) const {
-  return std::sqrt(x * x + y * y + z * z);
+bool Bubble::initialize() {
+  unsigned long now = millis();
+  unsigned long giveUp = now + 1000 * MAX_INIT_TIME_s;
+
+  while (now < giveUp) {
+    if (IMU.begin()) {
+      return true;
+    }
+    now = millis();
+  }
+
+  return false;
+}
+
+float Bubble::computeNorm() const {
+  return std::sqrt(_normX * _normX + _normY * _normY + _normZ * _normZ);
 }
 
 float Bubble::computeGravityAngleToAxisDeg(const Axis axis) const {
@@ -61,39 +81,54 @@ Axis Bubble::getLargestComponent() const {
   return axis;
 }
 
-void Bubble::updateGravity(float x, float y, float z) {
-  float norm = computeNorm(x, y, z);
+void Bubble::normalizeGravity() {
+  float norm = computeNorm();
   if (norm < EPS) {
     // Do not update.
     return;
   }
 
-  _normX = x / norm;
-  _normY = y / norm;
-  _normZ = z / norm;
+  _normX = _normX / norm;
+  _normY = _normY / norm;
+  _normZ = _normZ / norm;
 }
 
-void Bubble::updateUpSide(float x, float y, float z) {
-  updateGravity(x, y, z);
+bool Bubble::readGravity() {
+  if (!IMU.accelerationAvailable()) {
+    return false;
+  }
+
+  IMU.readAcceleration(_normX, _normY, _normZ);
+  normalizeGravity();
+  return true;
+}
+
+Side Bubble::getUpSide() {
+  if (!readGravity()) {
+    // If the gravity reading fails return the previous up-side.
+    return _upSide;
+  }
 
   Axis dominantComponent = getLargestComponent();
   if (!gravityCloseToAxis(dominantComponent)) {
-    // Transitioning does not count as a new side up: do not update.
-    return;
+    // Transitioning phase, return the previous up-side.
+    return _upSide;
   }
 
   switch (dominantComponent) {
   case AXIS_X:
-    *_upSide = _normX >= 0 ? Side::SIDE_REAR : Side::SIDE_FRONT;
+    _upSide = _normX >= 0 ? Side::SIDE_REAR : Side::SIDE_FRONT;
     break;
 
   case AXIS_Y:
-    *_upSide = _normY >= 0 ? Side::SIDE_LEFT : Side::SIDE_RIGHT;
+    _upSide = _normY >= 0 ? Side::SIDE_LEFT : Side::SIDE_RIGHT;
     break;
 
   default:
     // case AXIS_Z:
-    *_upSide = _normZ >= 0 ? Side::SIDE_TOP : Side::SIDE_BOTTOM;
+    _upSide = _normZ >= 0 ? Side::SIDE_TOP : Side::SIDE_BOTTOM;
     break;
   }
+
+  return _upSide;
 }
