@@ -27,7 +27,7 @@ enum Side {
 };
 
 enum State {
-  // Whenever the up side points towards the sky.
+  // Either the up side points towards the sky or blinking expired.
   // No timer is running and no blinking going on.
   STATE_STANDBY,
 
