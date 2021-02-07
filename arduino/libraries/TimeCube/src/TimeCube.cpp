@@ -29,8 +29,8 @@ TimeCube::TimeCube()
   Serial.println(nameOfSide(_upSide).c_str());
 #endif
 
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
+  pinMode(BLINK_PIN, OUTPUT);
+  noTone(BLINK_PIN);
 }
 
 bool TimeCube::updateUpSide() {
@@ -61,7 +61,11 @@ void TimeCube::setBlink() {
 
 void TimeCube::toggleBlink() {
   _blinkOn = !_blinkOn;
-  digitalWrite(LED_BUILTIN, _blinkOn);
+  if (_blinkOn) {
+    tone(BLINK_PIN, BLINK_PITCH);
+  } else {
+    noTone(BLINK_PIN);
+  }
   _toggleBlinkAt = _now + BLINK_INTERVAL_ms;
 }
 
@@ -124,7 +128,7 @@ void TimeCube::executeBlinking() {
   if (updateUpSide()) {
     // Quit blinking.
     _blinkOn = false;
-    digitalWrite(LED_BUILTIN, LOW);
+    noTone(BLINK_PIN);
 
     if (_upSide == SIDE_TOP) {
       _state = STATE_STANDBY;
@@ -167,7 +171,7 @@ void TimeCube::executeBlinking() {
   if (stateExpired()) {
     // Quit blinking.
     _blinkOn = false;
-    digitalWrite(LED_BUILTIN, LOW);
+    noTone(BLINK_PIN);
 
     _state = STATE_STANDBY;
 #ifdef DEBUG
