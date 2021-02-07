@@ -1,5 +1,7 @@
 #include "TimeCube.h"
 
+#include "Timers.h"
+
 #include <Arduino.h>
 
 
@@ -50,8 +52,14 @@ bool TimeCube::timeToToggleBlink() const {
 }
 
 void TimeCube::setTimer() {
-  unsigned long timerDuration = 1000 * 3;
+  unsigned long timerDuration = getTimerDuration(_upSide);
   _stateTransitionAt = _now + timerDuration;
+
+#ifdef DEBUG
+  Serial.print(" Start timer: ");
+  Serial.print(timerDuration / 1000);
+  Serial.println(" seconds");
+#endif
 }
 
 void TimeCube::setBlink() {
