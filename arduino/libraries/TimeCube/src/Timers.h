@@ -4,5 +4,6 @@
 #include "Constants.h"
 
 unsigned long getTimerDuration(const Side side);
+bool checkMaxTimer();
 
 #endif

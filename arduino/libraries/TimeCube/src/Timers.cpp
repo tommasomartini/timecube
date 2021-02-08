@@ -23,3 +23,13 @@ unsigned long getTimerDuration(const Side side) {
   // Convert to milliseconds.
   return 1000 * 60 * durationInMinutes;
 }
+
+bool checkMaxTimer() {
+  for (int i = 0; i < 6; ++i) {
+    Side side = (Side)i;
+    if (getTimerDuration(side) > MAX_TIMER) {
+      return false;
+    }
+  }
+  return true;
+}

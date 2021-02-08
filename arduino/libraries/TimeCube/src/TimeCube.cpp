@@ -14,6 +14,16 @@ TimeCube::TimeCube()
 , _state(STATE_STANDBY)
 , _bubble()
 {
+  if (!checkMaxTimer()) {
+    // Invalid timer value.
+
+#ifdef DEBUG
+    Serial.println("Invalid timer value");
+#endif
+
+    while (true);
+  }
+
   if (!_bubble.initialize()) {
     // If the IMU fails, do not continue.
 
