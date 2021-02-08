@@ -29,10 +29,10 @@ enum Axis {
 };
 
 enum Side {
-  SIDE_FRONT,
-  SIDE_REAR,
   SIDE_TOP,
   SIDE_BOTTOM,
+  SIDE_FRONT,
+  SIDE_REAR,
   SIDE_LEFT,
   SIDE_RIGHT,
 };

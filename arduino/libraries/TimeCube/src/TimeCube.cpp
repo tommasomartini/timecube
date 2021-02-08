@@ -10,7 +10,7 @@ TimeCube::TimeCube()
 , _stateTransitionAt(0L)
 , _toggleBlinkAt(0L)
 , _blinkOn(false)
-, _upSide()
+, _upSide(SIDE_TOP)
 , _state(STATE_STANDBY)
 , _bubble()
 {
