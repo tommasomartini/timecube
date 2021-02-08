@@ -22,6 +22,7 @@ private:
   State _state;
   Bubble _bubble;
 
+  bool genericTimeExpired(unsigned long expirationTime) const;
   bool stateExpired() const;
   bool timeToToggleBlink() const;
 

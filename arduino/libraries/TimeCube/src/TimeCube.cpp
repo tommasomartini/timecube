@@ -51,14 +51,27 @@ bool TimeCube::updateUpSide() {
   return prevUpSide != _upSide;
 }
 
+bool TimeCube::genericTimeExpired(unsigned long expirationTime) const {
+  // The timer is always "now + something": it will always wrap before "now".
+  if (_now < expirationTime) {
+    return false;
+  }
+
+  // "now" is "to the right" of timer. Is it overflow?
+  if (_now - expirationTime > MAX_TIMER) {
+    // Overflow.
+    return false;
+  }
+
+  return true;
+}
+
 bool TimeCube::stateExpired() const {
-  // TODO Check for overflow.
-  return _now >= _stateTransitionAt;
+  return genericTimeExpired(_stateTransitionAt);
 }
 
 bool TimeCube::timeToToggleBlink() const {
-  // TODO Check for overflow.
-  return _now >= _toggleBlinkAt;
+  return genericTimeExpired(_toggleBlinkAt);
 }
 
 void TimeCube::setTimer() {
