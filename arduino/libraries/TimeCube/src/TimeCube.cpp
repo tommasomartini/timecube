@@ -1,6 +1,7 @@
 #include "TimeCube.h"
 
 #include "Timers.h"
+#include "Tunes.h"
 
 #include <Arduino.h>
 
@@ -49,6 +50,8 @@ TimeCube::TimeCube()
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 #endif
+
+  playTurnOnTune(BLINK_PIN);
 }
 
 bool TimeCube::updateUpSide() {
@@ -125,6 +128,7 @@ void TimeCube::executeStandby() {
       Serial.println(nameOfSide(_upSide).c_str());
 #endif
 
+      playStartTimerTune(BLINK_PIN);
       setTimer();
     }
   }
@@ -135,20 +139,26 @@ void TimeCube::executeCounting() {
     if (_upSide == SIDE_TOP) {
       // Go back to standby.
       _state = STATE_STANDBY;
+
 #ifdef DEBUG
       Serial.print(nameOfState(STATE_COUNTING).c_str());
       Serial.print(" -> ");
       Serial.println(nameOfState(STATE_STANDBY).c_str());
 #endif
+
+      playInterruptTimerTune(BLINK_PIN);
       return;
     }
 
     // Activate a different timer.
     setTimer();
+
 #ifdef DEBUG
     Serial.print(" Set timer for side: ");
     Serial.println(nameOfSide(_upSide).c_str());
 #endif
+
+    playStartTimerTune(BLINK_PIN);
     return;
   }
 
@@ -187,6 +197,7 @@ void TimeCube::executeBlinking() {
     }
 
     _state = STATE_COUNTING;
+
 #ifdef DEBUG
     Serial.print(nameOfState(STATE_BLINKING).c_str());
     Serial.print(" -> ");
@@ -195,6 +206,8 @@ void TimeCube::executeBlinking() {
     Serial.print(" Set timer for side: ");
     Serial.println(nameOfSide(_upSide).c_str());
 #endif
+
+    playStartTimerTune(BLINK_PIN);
     setTimer();
     return;
   }
