@@ -11,10 +11,10 @@
 
 class TimeCube {
 private:
-  static const unsigned long BLINK_INTERVAL_ms = 200;
-  static const unsigned long BLINK_PITCH = NOTE_A3;
-  static const int BLINK_PIN = A5;
-  static const unsigned long BLINKING_DURATION_ms = 1000 * 60;
+  const unsigned long BLINK_INTERVAL_ms = 200;
+  const unsigned long BLINK_PITCH = NOTE_A3;
+  const int BLINK_PIN = A5;
+  const unsigned long BLINKING_DURATION_ms = 1000 * 60;
 
   unsigned long _now;
   unsigned long _stateTransitionAt;
