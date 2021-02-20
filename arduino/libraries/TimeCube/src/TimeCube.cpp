@@ -3,8 +3,6 @@
 #include "Timers.h"
 #include "Tunes.h"
 
-#include <Arduino.h>
-
 
 TimeCube::TimeCube()
 : _now(0L)
