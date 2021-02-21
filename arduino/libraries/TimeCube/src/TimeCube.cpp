@@ -42,6 +42,7 @@ TimeCube::TimeCube()
 
   pinMode(BLINK_PIN, OUTPUT);
   noTone(BLINK_PIN);
+  digitalWrite(BLINK_PIN, LOW);
 
 #ifdef DEBUG
   // In debug the built-in LED is synchronized with the buzzer.
@@ -179,6 +180,7 @@ void TimeCube::executeBlinking() {
     // Quit blinking.
     _blinkOn = false;
     noTone(BLINK_PIN);
+    digitalWrite(BLINK_PIN, LOW);
 
 #ifdef DEBUG
     digitalWrite(LED_BUILTIN, LOW);
@@ -229,6 +231,7 @@ void TimeCube::executeBlinking() {
     // Quit blinking.
     _blinkOn = false;
     noTone(BLINK_PIN);
+    digitalWrite(BLINK_PIN, LOW);
 
 #ifdef DEBUG
     digitalWrite(LED_BUILTIN, LOW);
