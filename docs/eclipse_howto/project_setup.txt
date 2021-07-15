@@ -1,0 +1,4 @@
+Include the necessary headers in "C/C++ General/Paths and Symbols/Includes". I did this in a trial-and-error fashion, trying to build and seeing which files ".h" where used but missing.
+
+Build the project as a statuc library, instead of an executable, so that you don't need to have a main (otherwise the linker fails). Do it in "C/C++ Build/Settings/Build Artifact/Artifact type".
+
