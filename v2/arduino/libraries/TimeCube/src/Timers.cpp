@@ -21,7 +21,7 @@ unsigned long getTimerDuration(const Side side) {
   }
 
   // Convert to milliseconds.
-  return 1000 * 60 * durationInMinutes;
+  return durationInMinutes * 1000 * 60;
 }
 
 bool checkMaxTimer() {
