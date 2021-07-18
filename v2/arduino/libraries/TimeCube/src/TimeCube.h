@@ -8,8 +8,6 @@
 
 //#define DEBUG 0
 
-void doit();
-
 
 class TimeCube {
 private:
