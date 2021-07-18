@@ -1,7 +1,6 @@
-#include "Constants.h"
+#include "debugUtils.h"
 
-
-std::string nameOfAxis(Axis axis) {
+const char* nameOfAxis(Axis axis) {
   switch (axis) {
   case AXIS_X:
     return "X";
@@ -14,7 +13,7 @@ std::string nameOfAxis(Axis axis) {
   }
 }
 
-std::string nameOfSide(Side side) {
+const char* nameOfSide(Side side) {
   switch (side) {
   case SIDE_TOP:
     return "Top";
@@ -33,7 +32,7 @@ std::string nameOfSide(Side side) {
   }
 }
 
-std::string nameOfState(State state) {
+const char* nameOfState(State state) {
   switch (state) {
   case STATE_STANDBY:
     return "Standby";

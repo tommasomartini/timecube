@@ -3,6 +3,13 @@
 #include "Timers.h"
 #include "Tunes.h"
 
+#include <HardwareSerial.h>
+
+
+#ifdef DEBUG
+#include "debugUtils.h"
+#endif
+
 //#include <MPU6050.h>
 
 
@@ -63,7 +70,7 @@ TimeCube::TimeCube()
 
 #ifdef DEBUG
   Serial.print("TimeCube initialized with up-side: ");
-  Serial.println(nameOfSide(_upSide).c_str());
+  Serial.println(nameOfSide(_upSide));
 #endif
 
   pinMode(BLINK_PIN, OUTPUT);
@@ -145,12 +152,12 @@ void TimeCube::executeStandby() {
       _state = STATE_COUNTING;
 
 #ifdef DEBUG
-      Serial.print(nameOfState(STATE_STANDBY).c_str());
+      Serial.print(nameOfState(STATE_STANDBY));
       Serial.print(" -> ");
-      Serial.println(nameOfState(STATE_COUNTING).c_str());
+      Serial.println(nameOfState(STATE_COUNTING));
 
       Serial.print(" Set timer for side: ");
-      Serial.println(nameOfSide(_upSide).c_str());
+      Serial.println(nameOfSide(_upSide));
 #endif
 
       playStartTimerTune(BLINK_PIN);
@@ -166,9 +173,9 @@ void TimeCube::executeCounting() {
       _state = STATE_STANDBY;
 
 #ifdef DEBUG
-      Serial.print(nameOfState(STATE_COUNTING).c_str());
+      Serial.print(nameOfState(STATE_COUNTING));
       Serial.print(" -> ");
-      Serial.println(nameOfState(STATE_STANDBY).c_str());
+      Serial.println(nameOfState(STATE_STANDBY));
 #endif
 
       playInterruptTimerTune(BLINK_PIN);
@@ -180,7 +187,7 @@ void TimeCube::executeCounting() {
 
 #ifdef DEBUG
     Serial.print(" Set timer for side: ");
-    Serial.println(nameOfSide(_upSide).c_str());
+    Serial.println(nameOfSide(_upSide));
 #endif
 
     playStartTimerTune(BLINK_PIN);
@@ -192,9 +199,9 @@ void TimeCube::executeCounting() {
   if (stateExpired()) {
     _state = STATE_BLINKING;
 #ifdef DEBUG
-    Serial.print(nameOfState(STATE_COUNTING).c_str());
+    Serial.print(nameOfState(STATE_COUNTING));
     Serial.print(" -> ");
-    Serial.println(nameOfState(STATE_BLINKING).c_str());
+    Serial.println(nameOfState(STATE_BLINKING));
 #endif
     setBlink();
     toggleBlink();
@@ -215,9 +222,9 @@ void TimeCube::executeBlinking() {
     if (_upSide == SIDE_TOP) {
       _state = STATE_STANDBY;
 #ifdef DEBUG
-      Serial.print(nameOfState(STATE_BLINKING).c_str());
+      Serial.print(nameOfState(STATE_BLINKING));
       Serial.print(" -> ");
-      Serial.println(nameOfState(STATE_STANDBY).c_str());
+      Serial.println(nameOfState(STATE_STANDBY));
 #endif
       return;
     }
@@ -225,12 +232,12 @@ void TimeCube::executeBlinking() {
     _state = STATE_COUNTING;
 
 #ifdef DEBUG
-    Serial.print(nameOfState(STATE_BLINKING).c_str());
+    Serial.print(nameOfState(STATE_BLINKING));
     Serial.print(" -> ");
-    Serial.println(nameOfState(STATE_COUNTING).c_str());
+    Serial.println(nameOfState(STATE_COUNTING));
 
     Serial.print(" Set timer for side: ");
-    Serial.println(nameOfSide(_upSide).c_str());
+    Serial.println(nameOfSide(_upSide));
 #endif
 
     playStartTimerTune(BLINK_PIN);
@@ -265,9 +272,9 @@ void TimeCube::executeBlinking() {
 
     _state = STATE_STANDBY;
 #ifdef DEBUG
-    Serial.print(nameOfState(STATE_BLINKING).c_str());
+    Serial.print(nameOfState(STATE_BLINKING));
     Serial.print(" -> ");
-    Serial.println(nameOfState(STATE_STANDBY).c_str());
+    Serial.println(nameOfState(STATE_STANDBY));
 #endif
   }
 }

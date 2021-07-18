@@ -47,8 +47,4 @@ enum State {
   STATE_BLINKING,
 };
 
-std::string nameOfAxis(Axis axis);
-std::string nameOfSide(Side side);
-std::string nameOfState(State state);
-
 #endif
