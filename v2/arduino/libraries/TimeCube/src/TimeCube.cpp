@@ -1,5 +1,6 @@
 #include "TimeCube.h"
 
+#include "BubbleMPU6050.h"
 #ifdef DEBUG
 #include "debugUtils.h"
 #endif
@@ -16,7 +17,6 @@ TimeCube::TimeCube()
 , _blinkOn(false)
 , _upSide(SIDE_TOP)
 , _state(STATE_STANDBY)
-, _bubble()
 {
   if (!checkMaxTimer()) {
     // Invalid timer value.
@@ -28,7 +28,9 @@ TimeCube::TimeCube()
     while (true);
   }
 
-  if (!_bubble.initialize()) {
+  _bubble = new BubbleMPU6050();
+
+  if (!_bubble->initialize()) {
     // If the IMU fails, do not continue.
 
 #ifdef DEBUG
@@ -38,7 +40,7 @@ TimeCube::TimeCube()
     while (true);
   }
 
-  _upSide = _bubble.getUpSide();
+  _upSide = _bubble->getUpSide();
 
 #ifdef DEBUG
   Serial.print("TimeCube initialized with up-side: ");
@@ -58,9 +60,13 @@ TimeCube::TimeCube()
   playTurnOnTune(BLINK_PIN);
 }
 
+TimeCube::~TimeCube() {
+	delete _bubble;
+}
+
 bool TimeCube::updateUpSide() {
   Side prevUpSide = _upSide;
-  _upSide = _bubble.getUpSide();
+  _upSide = _bubble->getUpSide();
   return prevUpSide != _upSide;
 }
 

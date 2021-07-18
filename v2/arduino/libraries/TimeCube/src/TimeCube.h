@@ -1,7 +1,7 @@
 #ifndef TIMECUBE_H
 #define TIMECUBE_H
 
-#include "BubbleMPU6050.h"
+#include "Bubble.h"
 #include "Pitches.h"
 
 #include <Arduino.h>
@@ -22,7 +22,7 @@ private:
   bool _blinkOn;
   Side _upSide;
   State _state;
-  BubbleMPU6050 _bubble;
+  Bubble* _bubble;
 
   bool genericTimeExpired(unsigned long expirationTime) const;
   bool stateExpired() const;
@@ -41,6 +41,7 @@ private:
 
 public:
   TimeCube();
+  ~TimeCube();
 
   void run();
 };
