@@ -4,14 +4,14 @@
 #include "Constants.h"
 
 class Bubble {
-private:
+protected:
   // The gravity vector must be at this angle from one of the axes for a timer to start.
   const float TILT_THRESHOLD_deg = 30.0;
 
   float _normX, _normY, _normZ;
   Side _upSide;
 
-  bool readGravity();
+  virtual bool readGravity() =0;
   float computeNorm() const;
   float computeGravityAngleToAxisDeg(Axis axis) const;
   bool gravityCloseToAxis(Axis axis) const;
@@ -20,11 +20,13 @@ private:
 
 public:
   Bubble();
+  virtual ~Bubble() {};
 
   /**
    * Returns false if initialization fails; true otherwise.
    */
-  bool initialize();
+  virtual bool initialize();
+
   Side getUpSide();
 };
 

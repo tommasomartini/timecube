@@ -1,40 +1,12 @@
 #include "TimeCube.h"
 
+#ifdef DEBUG
+#include "debugUtils.h"
+#endif
 #include "Timers.h"
 #include "Tunes.h"
 
 #include <HardwareSerial.h>
-
-
-#ifdef DEBUG
-#include "debugUtils.h"
-#endif
-
-//#include <MPU6050.h>
-
-
-//void doit() {
-//	MPU6050 mpu;
-//	mpu.initialize();
-//
-////	uint8_t mode = MPU6050_DLPF_BW_5;
-//
-//	uint8_t rate = 255;
-//
-////	mpu.setDLPFMode(MPU6050_DLPF_BW_5);
-//	mpu.setRate(rate);
-//	mpu.setSlaveDelayEnabled(0, true);
-//	mpu.setSlave4MasterDelay(rate);
-//
-//	int16_t* x;
-//	int16_t* y;
-//	int16_t* z;
-//
-//	while (true) {
-//		int16_t x = mpu.getAccelerationX();
-//		Serial.println(x);
-//	}
-//}
 
 
 TimeCube::TimeCube()

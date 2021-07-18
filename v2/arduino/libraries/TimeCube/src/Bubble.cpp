@@ -1,10 +1,6 @@
 #include "Bubble.h"
 
 #include <Arduino.h>
-//#include <MPU6050.h>
-
-//#include <cmath>
-//#include <stdexcept>
 
 namespace {
 float EPS = 1e-6;
@@ -17,20 +13,6 @@ unsigned long MAX_INIT_TIME_s = 3;
 Bubble::Bubble()
 : _normX(0.0f), _normY(0.0f), _normZ(1.0f), _upSide()
 {}
-
-bool Bubble::initialize() {
-  unsigned long now = millis();
-  unsigned long giveUp = now + 1000 * MAX_INIT_TIME_s;
-
-  while (now < giveUp) {
-//    if (IMU.begin()) {
-//      return true;
-//    }
-    now = millis();
-  }
-
-  return false;
-}
 
 float Bubble::computeNorm() const {
   return sqrt(_normX * _normX + _normY * _normY + _normZ * _normZ);
@@ -92,16 +74,6 @@ void Bubble::normalizeGravity() {
   _normX = _normX / norm;
   _normY = _normY / norm;
   _normZ = _normZ / norm;
-}
-
-bool Bubble::readGravity() {
-//  if (!IMU.accelerationAvailable()) {
-//    return false;
-//  }
-//
-//  IMU.readAcceleration(_normX, _normY, _normZ);
-  normalizeGravity();
-  return true;
 }
 
 Side Bubble::getUpSide() {
